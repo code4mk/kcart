@@ -1,4 +1,35 @@
 
+# cart
+
+## create
+
+```php
+Kcart::create($authUser);
+```
+
+## userCart
+
+```php
+Kcart::userCart($authUser);
+```
+
+## paid
+
+```php
+Kcart::paid($cartId);
+```
+
+## coupon
+
+```php
+Kcart::coupon($id,$code,$type,$amount);
+```
+
+## get
+
+```php 
+Kcart::get($cart_id,$authUser);
+```
 
 
 # cart item

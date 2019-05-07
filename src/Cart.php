@@ -47,16 +47,16 @@ class Cart
     }
   }
 
-  public function paid($id,$status=true)
+  public function paid($id)
   {
     $cart = Kcart::find($id);
     if(!is_null($cart)){
-      $cart->paid = $status;
+      $cart->paid = true;
       $cart->save();
     }
   }
 
-  public function coupon($id,$type,$amount){
+  public function coupon($id,$code,$type,$amount){
     $cart = Kcart::find($id);
     if(!is_null($cart)){
       if($type === 'fix'){
