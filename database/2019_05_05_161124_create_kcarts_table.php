@@ -50,6 +50,16 @@ class CreateKcartsTable extends Migration
             $table->timestamps();
         });
 
+        Schema::create('kcart_utsob_discount', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('title')->nullable();
+            $table->float('buy',16,2)->nullable();
+            $table->float('discount',16,2)->nullable();
+            $table->string('dis_type')->nullable();
+            $table->boolean('is_active')->default(false);
+            $table->timestamps();
+        });
+
     }
 
     /**
@@ -61,5 +71,6 @@ class CreateKcartsTable extends Migration
     {
         Schema::dropIfExists('kcarts');
         Schema::dropIfExists('kcart_items');
+        Schema::dropIfExists('kcart_utsob_discount');
     }
 }

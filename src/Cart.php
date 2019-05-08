@@ -4,6 +4,7 @@ namespace Code4mk\Kcart;
 
 use Code4mk\Kcart\Model\Kcart;
 use Code4mk\Kcart\Model\KcartItem;
+use Code4mk\Kcart\Model\Kutsob;
 use Config;
 
 class Cart
@@ -93,6 +94,26 @@ class Cart
 
     $totalPrice = 0;
     $afterCouponPrice = 0;
+    $utsob_discount = 0;
+
+    $utsobOffer = Kutsob::where('buy','<=',$cart{'price'})
+                          //->where('is_active',true)
+                          ->get();
+    if(sizeof($utsobOffer) > 0){
+      $max = 0;
+      foreach( $utsobOffer->toArray() as $k => $v )
+      {
+          $max = max( array( $max, $v['buy'] ) );
+      }
+      $detectOffer = collect($utsobOffer->toArray())->where('buy',$max);
+
+      if(array_values($detectOffer->toArray())[0]['dis_type'] == 'fix'){
+        $utsob_discount = array_values($detectOffer->toArray())[0]['discount'];
+      }else{
+        $utsob_discount = ($cart{'price'} * array_values($detectOffer->toArray())[0]['discount']) / 100;
+      }
+    }
+
 
 
     if(($cart{'cprice'} + $tax + $shippingCost)<0){
@@ -107,12 +128,13 @@ class Cart
         "coupon" => $cart{'coupon'},
         "discount" => $cart{'discount'},
         "cprice" => $afterCouponPrice ,
+        "utsob" => $utsob_discount,
         "tax" => [
           "rate" => $taxAmount . "%",
           "amount" => $tax
         ],
         "shipping" => $shippingCost,
-        "total" => $afterCouponPrice + $shippingCost + $tax ,
+        "total" => ($afterCouponPrice + $shippingCost + $tax ) - $utsob_discount,
       ],
       "items" => $cartItems
     ];
