@@ -98,7 +98,7 @@ class Cart
 
     if(!is_null($cart)){
       $utsobOffer = Kutsob::where('buy','<=',$cart{'price'})
-                            //->where('is_active',true)
+                            ->where('is_active',true)
                             ->get();
 
       if(sizeof($utsobOffer) > 0){
