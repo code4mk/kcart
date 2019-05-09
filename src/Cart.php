@@ -96,23 +96,28 @@ class Cart
     $afterCouponPrice = 0;
     $utsob_discount = 0;
 
-    $utsobOffer = Kutsob::where('buy','<=',$cart{'price'})
-                          //->where('is_active',true)
-                          ->get();
-    if(sizeof($utsobOffer) > 0){
-      $max = 0;
-      foreach( $utsobOffer->toArray() as $k => $v )
-      {
-          $max = max( array( $max, $v['buy'] ) );
-      }
-      $detectOffer = collect($utsobOffer->toArray())->where('buy',$max);
+    if(!is_null($cart)){
+      $utsobOffer = Kutsob::where('buy','<=',$cart{'price'})
+                            //->where('is_active',true)
+                            ->get();
 
-      if(array_values($detectOffer->toArray())[0]['dis_type'] == 'fix'){
-        $utsob_discount = array_values($detectOffer->toArray())[0]['discount'];
-      }else{
-        $utsob_discount = ($cart{'price'} * array_values($detectOffer->toArray())[0]['discount']) / 100;
+      if(sizeof($utsobOffer) > 0){
+        $max = 0;
+        foreach( $utsobOffer->toArray() as $k => $v )
+        {
+            $max = max( array( $max, $v['buy'] ) );
+        }
+        $detectOffer = collect($utsobOffer->toArray())->where('buy',$max);
+
+        if(array_values($detectOffer->toArray())[0]['dis_type'] == 'fix'){
+          $utsob_discount = array_values($detectOffer->toArray())[0]['discount'];
+        }else{
+          $utsob_discount = ($cart{'price'} * array_values($detectOffer->toArray())[0]['discount']) / 100;
+        }
       }
     }
+
+
 
 
 
@@ -142,6 +147,99 @@ class Cart
     if(sizeof($cartItems->toArray())>0){
       return $myCart;
     };
+  }
+
+
+
+  public function store($cart_id,$authUser)
+  {
+    $cart = Kcart::where('id',$cart_id)
+                  ->where('auth_user',$authUser)
+                  ->first();
+
+    $cartItems = KcartItem::where('kcart_id',$cart_id)->get();
+
+    $shippingArea = $cart{'shipping_area'};
+    $shippingCost = 10;
+    $isShippingArea = false;
+    $tax = 0;
+    $taxAmount = Config::get('kcart.tax');
+
+    if(!is_null($taxAmount)){
+      $tax = ($cart{'price'} * $taxAmount) / 100;
+    }
+
+    if(Config::get('kcart.shipping_area')){
+      $isShippingArea = true;
+      $shippingCost = Config::get('kcart.shipping_area_cost.'.$cart{'shipping_area'});
+    }
+
+    if(Config::get('kcart.shipping_in_out') && !$isShippingArea){
+      $shippingCost = Config::get('kcart.shipping_inout_cost.'.$cart{'shipping_area'});
+    }
+    // shipping free upto 6k
+    if($cart{'price'}>=Config::get('kcart.ship_free_upto')){
+      $shippingCost = 0;
+    }
+
+    $totalPrice = 0;
+    $afterCouponPrice = 0;
+    $utsob_discount = 0;
+
+    if(!is_null($cart)){
+      $utsobOffer = Kutsob::where('buy','<=',$cart{'price'})
+                            //->where('is_active',true)
+                            ->get();
+
+
+      if(sizeof($utsobOffer) > 0){
+        $max = 0;
+        foreach( $utsobOffer->toArray() as $k => $v )
+        {
+            $max = max( array( $max, $v['buy'] ) );
+        }
+        $detectOffer = collect($utsobOffer->toArray())->where('buy',$max);
+
+        if(array_values($detectOffer->toArray())[0]['dis_type'] == 'fix'){
+          $utsob_discount = array_values($detectOffer->toArray())[0]['discount'];
+        }else{
+          $utsob_discount = ($cart{'price'} * array_values($detectOffer->toArray())[0]['discount']) / 100;
+        }
+      }
+    }
+    if(($cart{'cprice'} + $tax + $shippingCost)<0){
+      $afterCouponPrice = 0;
+    }else{
+      $afterCouponPrice = $cart{'price'} - $cart{'discount'};
+    }
+
+    $cart->cprice = $afterCouponPrice;
+    $cart->utsob = $utsob_discount;
+    $cart->tax = $tax;
+    $cart->tax_rate = $taxAmount;
+    $cart->shipping_cost = $shippingCost;
+    $cart->total = ($afterCouponPrice + $shippingCost + $tax ) - $utsob_discount;
+    $cart->save();
+  }
+
+  public function getCart($cartID)
+  {
+    $cart = Kcart::where('id',$cartID)
+                  ->first();
+    $cartItems = KcartItem::where('kcart_id',$cartID)->get();
+
+    $data = [
+      "cart" => $cart,
+      "items" => $cartItems
+    ];
+    return $data;
+  }
+
+  public function shipping_area($cartID,$name)
+  {
+    $cart = Kcart::find($cartID);
+    $cart->shipping_area = $name;
+    $cart->save();
   }
 
 }

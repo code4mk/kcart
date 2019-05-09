@@ -21,7 +21,9 @@ class CreateKcartsTable extends Migration
             $table->float('discount',18,2)->nullable();
             $table->float('cprice',18,2)->nullable();
             $table->float('tax',18,2)->nullable();
+            $table->float('tax_rate',18,2)->nullable();
             $table->string('shipping_area')->nullable();
+            $table->float('shipping_cost',18,2)->nullable();
             $table->float('total',18,2)->nullable();
             $table->boolean('paid')->default(false);
             $table->string('affiliate')->nullable();
