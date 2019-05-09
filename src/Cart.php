@@ -38,6 +38,7 @@ class Cart
     if(!is_null($cart)){
       $cart->paid = true;
       $cart->save();
+      return $cart->id;
     }
   }
 

@@ -62,6 +62,21 @@ class CreateKcartsTable extends Migration
             $table->timestamps();
         });
 
+        Schema::create('kcart_shipping_address', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->integer('kcart_id')->nullable();
+            $table->integer('customer_id')->nullable();
+            $table->string('first')->nullable();
+            $table->string('last')->nullable();
+            $table->integer('phone')->nullable();
+            $table->string('email')->nullable();
+            $table->string('city')->nullable();
+            $table->string('district')->nullable();
+            $table->string('road')->nullable();
+            $table->string('post_code')->nullable();
+            $table->timestamps();
+        });
+
     }
 
     /**
@@ -74,5 +89,6 @@ class CreateKcartsTable extends Migration
         Schema::dropIfExists('kcarts');
         Schema::dropIfExists('kcart_items');
         Schema::dropIfExists('kcart_utsob_discount');
+        Schema::dropIfExists('kcart_shipping_address');
     }
 }
