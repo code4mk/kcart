@@ -32,4 +32,10 @@ class Ship
     $shipping = Kship::where('kcart_id',$cartID)->first();
     return $shipping;
   }
+
+  public function getCustomerAddresses($userID)
+  {
+    $shipping = Kship::where('customer_id',$userID)->get();
+    return $shipping;
+  }
 }
