@@ -13,8 +13,8 @@ class Ship
       $ship = new Kship;
       $ship->kcart_id = $cartID;
       $ship->customer_id = $customer;
-      $ship->first = $first;
-      $ship->last = $last;
+      $ship->first_name = $first;
+      $ship->last_name = $last;
       $ship->phone = $phone;
       $ship->email = $email;
       $ship->city = $city;

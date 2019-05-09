@@ -66,8 +66,8 @@ class CreateKcartsTable extends Migration
             $table->bigIncrements('id');
             $table->integer('kcart_id')->nullable();
             $table->integer('customer_id')->nullable();
-            $table->string('first')->nullable();
-            $table->string('last')->nullable();
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
             $table->integer('phone')->nullable();
             $table->string('email')->nullable();
             $table->string('city')->nullable();
